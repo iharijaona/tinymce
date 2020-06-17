@@ -129,9 +129,9 @@ Ready.execute(function () {
   InsertAll.append(rtls, [ Element.fromHtml('<p>Right to Left table</p>'), subject3 ]);
   InsertAll.append(ephoxUi, [ ltrs, rtls ]);
 
-  const ltrManager = TableResize.create(ResizeWire.body(tester, ltrs), ResizeDirection.ltr);
+  const ltrManager = TableResize.create(ResizeWire.body(tester, ltrs), ResizeDirection.ltr, 'default');
   ltrManager.on();
-  const rtlManager = TableResize.create(ResizeWire.body(subject3, rtls), ResizeDirection.rtl);
+  const rtlManager = TableResize.create(ResizeWire.body(subject3, rtls), ResizeDirection.rtl, 'default');
   rtlManager.on();
 
   // For firefox.

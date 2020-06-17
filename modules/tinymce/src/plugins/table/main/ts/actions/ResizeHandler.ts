@@ -12,7 +12,7 @@ import { Element as SugarElement } from '@ephox/sugar';
 import Tools from 'tinymce/core/api/util/Tools';
 import * as Direction from '../queries/Direction';
 import * as TableWire from './TableWire';
-import { hasTableResizeBars, hasObjectResizing, isPixelsForced, isPercentagesForced } from '../api/Settings';
+import * as Settings from '../api/Settings';
 import Editor from 'tinymce/core/api/Editor';
 import * as Events from '../api/Events';
 import * as Util from '../alien/Util';
@@ -63,8 +63,8 @@ export const getResizeHandler = function (editor: Editor): ResizeHandler {
     const direction = TableDirection(Direction.directionAt);
     const rawWire = TableWire.get(editor);
     wire = Option.some(rawWire);
-    if (hasObjectResizing(editor) && hasTableResizeBars(editor)) {
-      const sz = TableResize.create(rawWire, direction);
+    if (Settings.hasObjectResizing(editor) && Settings.hasTableResizeBars(editor)) {
+      const sz = TableResize.create(rawWire, direction, Settings.getColumnReszingBehaviour(editor));
       sz.on();
       sz.events.startDrag.bind(function (_event) {
         selectionRng = Option.some(editor.selection.getRng());
@@ -100,9 +100,9 @@ export const getResizeHandler = function (editor: Editor): ResizeHandler {
 
       const tableHasPercentage = getRawWidth(targetElm).map((w) => percentageBasedSizeRegex.test(w)).getOr(false);
 
-      if (tableHasPercentage && isPixelsForced(editor)) {
+      if (tableHasPercentage && Settings.isPixelsForced(editor)) {
         enforcePixels(targetElm);
-      } else if (!tableHasPercentage && isPercentagesForced(editor)) {
+      } else if (!tableHasPercentage && Settings.isPercentagesForced(editor)) {
         enforcePercentage(targetElm);
       }
 

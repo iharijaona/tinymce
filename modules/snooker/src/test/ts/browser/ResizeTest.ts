@@ -57,7 +57,7 @@ UnitTest.test('ResizeTest', function () {
     // [50%, 50%] existing widths.
     assert.eq([ 50, 50 ], widths);
 
-    const deltas = Deltas.determine(widths, 0, step, tableSize);
+    const deltas = Deltas.determine(widths, 0, step, tableSize, 'default');
 
     // [25%, -25%] deltas.
     assert.eq([ 25, -25 ], deltas);
@@ -115,7 +115,7 @@ UnitTest.test('ResizeTest', function () {
       assert.eq(true, x < 1 && x > -1);
     });
 
-    const deltas = Deltas.determine(widths, 0, step, tableSize);
+    const deltas = Deltas.determine(widths, 0, step, tableSize, 'default');
 
     // [25%, -25%] deltas.
     assert.eq([ 25, -25 ], deltas);
@@ -164,7 +164,7 @@ UnitTest.test('ResizeTest', function () {
     // [50%, 50%] existing widths.
     assert.eq([ 400, 400 ], widths);
 
-    const deltas = Deltas.determine(widths, 0, step, tableSize);
+    const deltas = Deltas.determine(widths, 0, step, tableSize, 'default');
 
     // [25%, -25%] deltas.
     assert.eq([ 200, -200 ], deltas);
@@ -209,7 +209,7 @@ UnitTest.test('ResizeTest', function () {
     // [50%, 50%] existing widths.
     assert.eq([ 400, 400 ], widths);
 
-    const deltas = Deltas.determine(widths, 0, step, tableSize);
+    const deltas = Deltas.determine(widths, 0, step, tableSize, 'default');
 
     // [25%, -25%] deltas.
     assert.eq([ 200, -200 ], deltas);

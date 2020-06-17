@@ -17,7 +17,7 @@ import * as TableLookup from './TableLookup';
 import * as TableOperations from './TableOperations';
 import * as TablePositions from './TablePositions';
 import * as TableRender from './TableRender';
-import { TableResize } from './TableResize';
+import { TableResize, ColumnResizing } from './TableResize';
 import * as RunOperation from '../model/RunOperation';
 import * as GridRow from '../model/GridRow';
 import * as OtherCells from './OtherCells';
@@ -43,6 +43,7 @@ export {
   TablePositions,
   TableRender,
   TableResize,
+  ColumnResizing,
   RunOperation,
   GridRow,
   OtherCells

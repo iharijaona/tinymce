@@ -11,7 +11,7 @@ import { CopyCols, CopyRows, TableFill, TableLookup } from '@ephox/snooker';
 import { Element, Insert, Remove, Replication } from '@ephox/sugar';
 import Editor from 'tinymce/core/api/Editor';
 import { insertTableWithDataValidation } from '../actions/InsertTable';
-import { TableActions, BasicTableAction, AdvancedPasteTableAction } from '../actions/TableActions';
+import { TableActions, BasicTableAction, AdvancedPasteTableAction, GetterTableAction } from '../actions/TableActions';
 import * as Util from '../alien/Util';
 import { Clipboard } from '../core/Clipboard';
 import * as TableTargets from '../queries/TableTargets';
@@ -57,6 +57,13 @@ const registerCommands = (editor: Editor, actions: TableActions, cellSelection: 
       });
     });
   });
+
+  // const getFromSelection = (execute: GetterTableAction): string => TableSelection.getSelectionStartCell(editor).bind((cell) =>
+  //   getTableFromCell(cell).bind((table) => {
+  //     const targets = TableTargets.forMenu(selections, table, cell);
+  //     return execute(table, targets);
+  //   });
+  // ).getOr(''); // TODO better fallback?
 
   const copyRowSelection = () => TableSelection.getSelectionStartCell(editor).map((cell) =>
     getTableFromCell(cell).bind((table) => {
@@ -114,6 +121,18 @@ const registerCommands = (editor: Editor, actions: TableActions, cellSelection: 
     mceTablePasteRowAfter: (_grid) => pasteOnSelection(actions.pasteRowsAfter, clipboard.getRows),
     mceTableDelete: eraseTable
   }, (func, name) => editor.addCommand(name, func));
+
+  Obj.each({
+    mceTableCellType: (_ui, args) => actions.setTableCellType(editor, args),
+    mceTableRowType: (_ui, args) => actions.setTableRowType(editor, args),
+    mceTableColumnType: (_ui, args) => actions.setTableColumnType(editor, args)
+  }, (func, name) => editor.addCommand(name, func));
+
+  Obj.each({
+    mceTableRowType: () => getFromSelection(actions.getTableRowType),
+    mceTableCellType: () => getFromSelection(actions.getTableCellType),
+    mceTableColType: () => getFromSelection(actions.getTableColType)
+  }, (func, name) => editor.addQueryValueHandler(name, func))
 
   // Register dialog commands
   Obj.each({

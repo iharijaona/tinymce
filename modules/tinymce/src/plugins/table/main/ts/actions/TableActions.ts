@@ -5,7 +5,7 @@
  * For commercial licenses see https://www.tiny.cloud/
  */
 
-import { Arr, Fun, Option } from '@ephox/katamari';
+import { Arr, Fun, Option, Obj } from '@ephox/katamari';
 import {
   CellMutations, TableDirection, TableFill, TableGridSize, TableOperations, RunOperation, ResizeWire
 } from '@ephox/snooker';
@@ -18,11 +18,15 @@ import { fireNewCell, fireNewRow } from '../api/Events';
 import Editor from 'tinymce/core/api/Editor';
 import { DomDescent } from '@ephox/phoenix';
 import { HTMLTableElement, Range } from '@ephox/dom-globals';
+import { getCellsFromSelection, getRowsFromSelection } from '../selection/TableSelection';
+import { switchCellType, switchSectionType } from '../core/TableSections';
 
 type TableAction<T> = (table: Element<HTMLTableElement>, target: T) => Option<Range>;
 export type BasicTableAction = TableAction<RunOperation.CombinedTargets>;
 export type PasteTableAction = TableAction<RunOperation.TargetPaste>;
 export type AdvancedPasteTableAction = TableAction<RunOperation.TargetPasteRows>;
+export type SimpleTableAction = (editor: Editor, args: Record<string, any>) => void;
+export type GetterTableAction = (table: Element<HTMLTableElement>, target: RunOperation.CombinedTargets) => string;
 
 export interface TableActions {
   deleteRow: BasicTableAction;
@@ -38,6 +42,12 @@ export interface TableActions {
   pasteRowsBefore: AdvancedPasteTableAction;
   pasteRowsAfter: AdvancedPasteTableAction;
   pasteCells: PasteTableAction;
+  setTableCellType: SimpleTableAction;
+  setTableRowType: SimpleTableAction;
+  setTableColumnType: SimpleTableAction;
+  getTableRowType: GetterTableAction;
+  getTableCellType: GetterTableAction;
+  getTableColType: GetterTableAction;
 }
 
 export const TableActions = (editor: Editor, lazyWire: () => ResizeWire): TableActions => {
@@ -101,6 +111,27 @@ export const TableActions = (editor: Editor, lazyWire: () => ResizeWire): TableA
 
   const pasteCells = execute(TableOperations.pasteCells, Fun.always, Fun.noop, lazyWire);
 
+  const setTableCellType = (editor: Editor, args: Record<string, any>) =>
+    Obj.get(args, 'type').each((type) => {
+      if (Arr.contains([ 'td', 'th' ], type)) {
+        switchCellType(editor.dom, getCellsFromSelection(editor), type);
+      }
+    });
+  const setTableRowType = (editor: Editor, args: Record<string, any>) =>
+    // type: 'header' | 'body' | 'footer'
+    Obj.get(args, 'type').each((type) => {
+      if (Arr.contains([ 'header', 'body', 'footer' ], type)) {
+        Arr.map(getRowsFromSelection(editor), (row) => switchSectionType(editor, row, type));
+      }
+    });
+
+  const setTableColumnType = (editor: Editor, args: Record<string, any>) => {
+    // use snooker to do this - CopyCols has code for detecting cols that accounts for colspans and such, so
+  };
+  const getTableRowType = (_table, _target) => '';
+  const getTableCellType = (_table, _target) => '';
+  const getTableColType = (_table, _target) => '';
+
   return {
     deleteRow,
     deleteColumn,
@@ -114,6 +145,12 @@ export const TableActions = (editor: Editor, lazyWire: () => ResizeWire): TableA
     pasteColsAfter,
     pasteRowsBefore,
     pasteRowsAfter,
-    pasteCells
+    pasteCells,
+    setTableCellType,
+    setTableRowType,
+    setTableColumnType,
+    getTableRowType,
+    getTableCellType,
+    getTableColType
   };
 };
